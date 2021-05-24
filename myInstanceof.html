@@ -1,0 +1,44 @@
+<!--
+ * @Author: zhangjianfei
+ * @Email: 
+ * @Date: 2021-05-24 14:21:34
+ * @LastEditors: zhangjianfei
+ * @LastEditTime: 2021-05-24 14:21:44
+ * @Description: 
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>实现一个自己的instanceof</title>
+</head>
+<body>
+    
+</body>
+</html>
+<script>
+
+
+// a instanceof b
+function myInstanceof(left, right){
+    // 首先判断需要判断的a不等于object或者null 直接返回false
+    if(typeof left !== 'object' || left === null) return false
+    // 调用Object的自带api，拿到参数的原型对象
+    let proto = Object.getPrototypeOf(left)
+    while(true){
+        if(proto === null) return false
+        if(proto === right.prototype) return true
+        proto = Object.getPrototypeOf(proto)
+    }
+}
+
+function myPromise(){}
+console.log(myInstanceof(new Number(123), Number)); // true
+console.log(myInstanceof(new myPromise(), Object)); // true
+console.log(myInstanceof(123, Number)) // false
+
+
+
+</script>

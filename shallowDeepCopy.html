@@ -1,0 +1,74 @@
+<!--
+ * @Author: zhangjianfei
+ * @Email: 
+ * @Date: 2021-05-24 14:28:09
+ * @LastEditors: zhangjianfei
+ * @LastEditTime: 2021-05-24 15:10:42
+ * @Description: 
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>实现一个深浅拷贝</title>
+</head>
+
+<body>
+
+</body>
+
+</html>
+<script>
+    /**
+     * 浅拷贝思路：
+     *  1. 对于基本数据类型做一个最基本的拷贝
+     *  2. 对于引用数据类型开辟一个新的堆内存存储，并且拷贝一层对象属性
+     * 
+    */
+    function shallowCopy(target) {
+        // 判断数据类型
+        if (typeof target === 'object' && target !== null) {
+            // 判断target是一个数组还是对象
+            const cloneTarget = Array.isArray(target) ? [] : {};
+            for (let prop in target) {
+                // 克隆target的每一个属性
+                if (target.hasOwnProperty(prop)) {
+                    cloneTarget[prop] = target[prop]
+                }
+            }
+            return cloneTarget;
+        } else {
+            return target
+        }
+    }
+
+
+    /**
+     * 深拷贝：乞丐版本
+     *  方式一： 使用JSON.stringify() 和JSON.parse()
+     *  
+     * 其实就是把一个对象序列化成为 JSON 的字符串，并将对象里面的内容转换成字符串，
+     * 最后再用 JSON.parse() 的方法将JSON 字符串生成一个新的对象
+    */
+
+    // 示例
+    let obj1 = {a:1,b:3,c:[1,2,3,4]}
+    let obj2 = JSON.parse(JSON.stringify(obj1))
+    console.log(obj2) // {a: 1, b: 3, c: Array(4)}
+    obj1.a = 11
+    obj1.c.push(5)
+    console.log(obj1) // {a: 11, b: 3, c: [1,2,3,4,5]}
+    console.log(obj2) //  {a: 1, b: 3, c: [1,2,3,4]}
+    // 貌似成功了
+    
+
+    /**
+     * 
+     * 
+     * 
+    */
+
+</script>
