@@ -3,7 +3,7 @@
  * @Email: 
  * @Date: 2021-05-24 14:28:09
  * @LastEditors: zhangjianfei
- * @LastEditTime: 2021-05-24 15:10:42
+ * @LastEditTime: 2021-05-25 11:16:46
  * @Description: 
 -->
 <!DOCTYPE html>
@@ -49,26 +49,167 @@
     /**
      * 深拷贝：乞丐版本
      *  方式一： 使用JSON.stringify() 和JSON.parse()
-     *  
      * 其实就是把一个对象序列化成为 JSON 的字符串，并将对象里面的内容转换成字符串，
      * 最后再用 JSON.parse() 的方法将JSON 字符串生成一个新的对象
     */
-
+    // 貌似成功了，但是基本业务开发需求是满足了。但是还有以下点并不能满足。
+    /**
+     * 1. 如果值有函数、undefined、symbol这几种类型，stringify字符串序列化的时候，字符串中的中的键值对会消失
+     * 2. 拷贝Date引用类型会变成字符串
+     * 3. 无法拷贝不可枚举的属性
+     * 4. 无法拷贝对象的原型链
+     * 5. 拷贝RegExp引用类型会变成空对象
+     * 6. 对象中含有NaN、Infinity以及-Infinity，JSON序列化的结果会变成null
+     * 7. 无法拷贝对象的循环应用，几对象成环(obj[key] = obj)
+    */
     // 示例
-    let obj1 = {a:1,b:3,c:[1,2,3,4]}
+    let obj1 = { a: 1, b: 3, c: [1, 2, 3, 4], d: undefined }
     let obj2 = JSON.parse(JSON.stringify(obj1))
     console.log(obj2) // {a: 1, b: 3, c: Array(4)}
     obj1.a = 11
     obj1.c.push(5)
     console.log(obj1) // {a: 11, b: 3, c: [1,2,3,4,5]}
     console.log(obj2) //  {a: 1, b: 3, c: [1,2,3,4]}
-    // 貌似成功了
-    
+
+
+
+    /**
+     * 深拷贝：基础版（手写递归实现）
+     * 
+     * 问题： 递归实现也有问题，以上提出了枚举的，Date等那些引用也不能正确拷贝
+     * 
+    */
+    // 示例
+    let obj3 = { a: { b: 1 }, date: new Date(), c: null, d: undefined }
+    function deepClonej(obj) {
+        let cloneObj1 = {}
+        for (let key in obj) {
+            // 判断是对象还是基本类型
+            if (typeof obj[key] === 'object') {
+                cloneObj1[key] = deepClonej(obj[key])
+            } else {
+                cloneObj1[key] = obj[key]
+            }
+        }
+        return cloneObj1
+    }
+
+    let obj4 = deepClonej(obj3)
+    console.log(obj3)
+    console.log(obj4)
+
+
+
+    /**
+     * 方法三： 改进版（改进后递归）
+     * 
+     * 思路：
+     *  1. 针对能够遍历对象的不可枚举属性以及Symbol类型，可以使用Reflect.ownKeys方法
+     *  2. 当参数Date、regExp类型，则直接生成一个新的实例返回。
+     *  3. 利用Object的getOwnPropertyDescriptors 方法可以获得对象的所有属性，以及对应的特性，
+     *      顺便结合Object的create方法创建一个新的对象，并继承传入原对象的原型连
+     *  4. 利用WeakMap类型作为Hash表，以为WeakMap是弱引用类型，可以有效防止内存泄漏，
+     *     作为检测循环引用很有帮助，如果存在循环，则引用直接返回WebkMap存储的值
+     * **/
+
+    const isComplexDataType = obj => (typeof obj === 'object' || typeof obj === 'function') && (obj !== null)
+    const deepClone = function (obj, hash = new WeakMap()) {
+        if (obj.constructor === Date) return new Date(obj)       // 日期对象直接返回一个新的日期对象
+        if (obj.constructor === RegExp) return new RegExp(obj)     //正则对象直接返回一个新的正则对象
+        //如果循环引用了就用 weakMap 来解决
+        if (hash.has(obj)) return hash.get(obj)
+        // getOwnPropertyDescriptors 获取所有键
+        let allDesc = Object.getOwnPropertyDescriptors(obj)
+        //遍历传入参数所有键的特性 getPrototypeOf 方法返回指定对象的原型 也就是prototype属性的值
+        let cloneObj = Object.create(Object.getPrototypeOf(obj), allDesc)
+        //继承原型链
+        hash.set(obj, cloneObj)
+        for (let key of Reflect.ownKeys(obj)) {
+            cloneObj[key] = (isComplexDataType(obj[key]) && typeof obj[key] !== 'function') ? deepClone(obj[key], hash) : obj[key]
+        }
+        return cloneObj
+    }
+
+
+
+
+    // 下面是验证代码
+    let obj = {
+        num: 0,
+        str: '',
+        boolean: true,
+        unf: undefined,
+        nul: null,
+        obj: { name: '我是一个对象', id: 1 },
+        arr: [0, 1, 2],
+        func: function () { console.log('我是一个函数') },
+        date: new Date(0),
+        reg: new RegExp('/我是一个正则/ig'),
+        [Symbol('1')]: 1,
+    };
+    Object.defineProperty(obj, 'innumerable', {
+        enumerable: false, value: '不可枚举属性'
+    }
+    );
+    obj = Object.create(obj, Object.getOwnPropertyDescriptors(obj))
+    obj.loop = obj    // 设置loop成循环引用的属性
+    let cloneObj = deepClone(obj)
+    cloneObj.arr.push(4)
+    console.log('---------------------------------------------')
+    console.log('obj', obj)
+    console.log('cloneObj', cloneObj)
+
+
 
     /**
      * 
+     * 实现属于自己的深拷贝
      * 
      * 
     */
+    function myDeepClone(obj) {
+        // 首先判断日期和正则，返回一个新的对象，防止得不到解析
+        if (obj.constructor === Date) return new Date(obj) 
+        if (obj.constructor === RegExp) return new RegExp(obj)
+        // 判断obj的类型是对象还数组定义对应的变量
+        let objClone = Array.isArray(obj) ? [] : {};
+        //判断obj的类型是obj还是普通值
+        if (obj && typeof obj === 'object') {
+            for (let key in obj) {
+                // 判断是普通值还是object类型
+                if (obj[key] && typeof obj[key] === 'object') {
+                    // object就再次递归调用
+                    objClone[key] = myDeepClone(obj[key]);
+                } else {
+                    objClone[key] = obj[key]
+                }
+            }
+        } else {
+            return obj
+        }
+        return objClone;
+    }
+
+
+    let myObj = {
+        num: 0,
+        str: '',
+        boolean: true,
+        unf: undefined,
+        nul: null,
+        obj: { name: '我是一个对象', id: 1 },
+        arr: [],
+        obj: { name: '我是一个对象', id: 1 },
+        arr: [0, 1, 2],
+        func: function () { console.log('我是一个函数') },
+        date: new Date(0),
+        reg: new RegExp('/我是一个正则/ig'),
+        [Symbol('1')]: 1,
+    }
+
+    let myDeepCloneObj = myDeepClone(myObj)
+    myDeepCloneObj.arr.push(6)
+    console.log('myObj', myObj)
+    console.log('myDeepClone', myDeepCloneObj)
 
 </script>
