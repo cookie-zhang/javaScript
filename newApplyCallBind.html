@@ -1,0 +1,182 @@
+<!--
+ * @Author: zhangjianfei
+ * @Email: 
+ * @Date: 2021-05-25 20:54:30
+ * @LastEditors: zhangjianfei
+ * @LastEditTime: 2021-05-26 09:29:13
+ * @Description: 
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+</body>
+
+</html>
+<script>
+
+    /**
+     * new call bind 的区别
+     * 1. 传参数方式不一样 call(this, p1,p2), apply(this, [p1,p2]), bind(this, p1,p2)
+     * 2. call和apply是立即执行函数，bind是不立即执行函数
+    */
+    let a = {
+        name: 'jack',
+        getName: function (msg) {
+            return msg + this.name
+        }
+    }
+    let b = {
+        name: 'lily'
+    }
+    console.log(a.getName.call(b, 'hi~')) // hi~lily
+    let name = a.getName.bind(b, 'haha')
+    console.log(name()) // hahalily
+
+
+    /**
+     * 复习判断数据类型，使用call
+     * 
+    */
+    function getType(obj) {
+        let type = typeof obj
+        // 判断常量
+        if (type !== 'onject') {
+            return type
+        }
+        return Object.toString.call(obj).replace(/$[object (/S+)/]$/, $1)
+    }
+
+    console.log(getType([]))
+
+    /**
+     * 使用apply判断数组大小值
+     * 
+    */
+    let arr = [1, 2, 3, 4, 5, 6, 4, 44, 55, 12313, 33, 4, 2123, 99999]
+    console.log(Math.max.apply(Math, arr)) // 99999
+    console.log(Math.min.apply(Math, arr)) // 1
+
+    /**
+     * 回顾组合继承，原型链继承和call、apply继承结合
+     * 
+    */
+
+    function parent1() {
+        this.name = 'parent1'
+        this.arr = [1, 2, 3, 4]
+    }
+    parent1.prototype.getName = function () {
+        return this.name
+    }
+
+    function child1() {
+        parent1.call(this)
+        this.type = 'child1'
+    }
+
+    child1.prototype = new parent1()
+    child1.prototype.constructor = child1
+    let c1 = new child1()
+
+    console.log(c1.name, c1.arr, c1.type, c1.getName())
+
+
+
+    /**
+     * 目标：实现new call apply bind
+     * new的实现，
+     * 思路：
+     *   1. 让实例可以访问到似有属性
+     *   2. 让实例可以访问构造函数原型（constructor.prototype）所有原型链上的属性
+     *   3. 构造函数返回的最后结果是引用数据类型
+    */
+
+    function _new(ctor, ...args) {
+        // 边界条件处理
+        if (typeof ctor !== 'function') {
+            throw "ctor 参数必须是一个function"
+        }
+        // 创建一个新对象
+        let obj = new Object()
+        obj.__proto__ = Object.create(ctor.prototype)
+        let res = ctor.apply(obj, [...args])
+        // 判断是不是Object
+        let isObject = typeof res === 'object' && res !== null;
+        let isFunction = typeof res === 'function'
+        return isObject || isFunction ? res : obj
+
+    }
+    function test(name) {
+        this.name = name
+    }
+    _new(test, 'zs')
+    console.log(_new(test, 'zs'))
+
+    /**
+     * call appy的实现
+     * 
+    */
+    Function.prototype.myCall = function (context, ...args) {
+        // context 执行上下文， args是参数, context 如果不传就是window
+        var context = context || window;
+        // 自定义个函数传入调用者，比如在这了就是p函数， 然后执行p函数传入参数
+        context.fn = this
+        let result = eval('context.fn(...args)')
+        delete context.fn()
+        return result
+    }
+
+    Function.prototype.myApply = function (context, args) {
+        let context = context || window;
+        // 首先判断是不是数组args，抛出错误
+        if (args && !(args instanceof Array)) {
+            throw ('apply 第二个参数必须是个数组')
+        }
+        context.fn = this
+        let result = eval(context.fn(...args))
+        delete context.fn
+        return result
+    }
+
+    function p(...args) {
+        console.log(args)
+        console.log(this.name)
+    }
+
+    function c() {
+        p.myCall(this, 'ccccc')
+        this.type = 'c1'
+        return this
+    }
+    p.myCall({ name: 'asd' }, '1', '2')
+
+
+    /**
+     *  bind的实现其实和apply很相似，但是bind不是立即执行函数
+     *
+     *
+    */
+
+    Function.prototype.bind = function (context, ...args) {
+        if (context && typeof context !== 'function') {
+            return new Error('必须传入一个函数')
+        }
+        var self = this
+        var fbound = function () {
+            self.apply(this instanceof self ? this : context, args.concat(Array.prototype.slice.call(arguments)))
+        }
+        if (this.prototype) {
+            fbound.prototype = Object.create(this.prototype)
+        }
+        return fbound
+    }
+</script>
