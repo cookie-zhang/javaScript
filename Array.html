@@ -1,0 +1,164 @@
+<!--
+ * @Author: zhangjianfei
+ * @Email: 
+ * @Date: 2021-05-26 16:46:41
+ * @LastEditors: zhangjianfei
+ * @LastEditTime: 2021-05-26 22:09:25
+ * @Description: 
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数组</title>
+</head>
+
+<body>
+
+</body>
+
+</html>
+<script>
+    var a = Array(6)
+    var b = []
+    b.length = 6
+    console.log(a, b)
+
+    /**
+     * Array.of: 用于将参数依次转化为数组的每一项, 然后返回这个新数组
+     * Array.from: 基于其他对象创建新数组
+     * es6新增判断是不是数组：Array.isArray
+     * 
+    */
+
+    /**
+     * 改变自身的方法：pop、push、reverse、shift、sort、splice、unshift。es6新增：copyWithin、fill
+     * 
+    */
+    // pop 删除数组的最后一个，也可以理解为栈顶
+    var arr = ['cat', 'dog', 'cow', 'chicken', 'mouse']
+    console.log(arr.pop(), arr) // mouse  ['cat', 'dog', 'cow', 'chicken']
+    // push 在后面添加，返回长度，改变新数组
+    var arr = ['cat', 'dog', 'cow', 'chicken', 'mouse']
+    console.log(arr.push('goo'), arr) // 6 ['cat', 'dog', 'cow', 'chicken', 'mouse', 'goo']
+    // reverse 反转
+    var arr = ['cat', 'dog', 'cow', 'chicken', 'mouse']
+    console.log(arr.reverse(), arr) // ["mouse", "chicken", "cow", "dog", "cat"]  ["mouse", "chicken", "cow", "dog", "cat"]
+    // shift 删除第一个 返回删除的
+    var arr = ['cat', 'dog', 'cow', 'chicken', 'mouse']
+    console.log(arr.shift(), arr) // cat  ['dog', 'cow', 'chicken', 'mouse']
+    // unshift  在第一个添加 返回长度
+    var arr = ['cat', 'dog', 'cow', 'chicken', 'mouse']
+    console.log(arr.unshift('moken'), arr)  // 6  ["moken", "cat", "dog", "cow", "chicken", "mouse"]
+    // sort 
+    var arr = ['cat', 'dog', 'cow', 'chicken', 'mouse']
+    console.log(arr.sort(), arr)  // ["cat", "chicken", "cow", "dog", "mouse"]  ["cat", "chicken", "cow", "dog", "mouse"]
+    // splice 截取 [ ] 前闭后闭
+    var arr = ['cat', 'dog', 'cow', 'chicken', 'mouse']
+    console.log(arr.splice(1, 3), arr) // ["dog", "cow", "chicken"]  ["cat", "mouse"]
+    // copyWithin IE11不支持 copyWithin(targt, start, end )
+    // fill arr.fill(value, start, end) [ ) 闭 开 用value 去替换在范围内的所有
+
+
+    /**
+     * 不改变自身的方法： 
+     * concat、join、slice、toString、toLocaleString、indexOf、lastIndexOf、
+     * 还没成为标准的toSource，es7的includes
+     * 
+    */
+    // concat 合并数组
+    var arr = [1, 2, 3, 4]
+    var arr1 = [7, 8, 9]
+    console.log(arr.concat(arr1), arr, arr1) // [1, 2, 3, 4, 7, 8, 9]   [1, 2, 3, 4]   [7, 8, 9]
+    // join 数组转化为可连接的字符串
+    var arr = [1, 2, 3, 4]
+    console.log(arr.join('+'), arr) // 1+2+3+4  [1, 2, 3, 4]
+    // slice 分割 返回分割的内容 [) 前闭后开
+    var arr = [1, 2, 3, 4]
+    console.log(arr.slice(1, 3), arr) // [2,3] [1,2,3,4]
+    // toString 转化为字符串
+    var arr = [1, 2, 3, 4]
+    console.log(arr.toString()) // 1,2,3,4  typeOf是string
+    // toLocaleString 可以转化日期
+    var arr = [{ name: 'zz' }, 123, "abc", new Date()]
+    console.log(arr.toLocaleString())  // [object Object],123,abc,2021/5/26下午5:53:35
+    // indexOf 返回下标， 没有返回-1
+    var arr = [1, 2, 3, 4, 5]
+    console.log(arr.indexOf(3)) // 2
+    // lastIndexOf 对数组和上面的一样
+    var arr = [1, 2, 3, 4, 5]
+    console.log(arr.lastIndexOf()) // 2
+    // includes es7  判断数组包含指定内容
+    var arr = [1, 2, 3, 4, 5, 6]
+    console.log(arr.includes(3)) // true 注意 +0 -0 都是按照0处理
+
+
+    /**
+     * 数组遍历方法：
+     *  es5: forEach、every、some、filter、map、reduce、reduceRight
+     *  es6: entries、find、findIndex、keys、values
+     * 
+    */
+    // forEach
+    var array = [1, 2, 3, 4, 5]
+    var obj = { name: 'cc' }
+    let foreach = array.forEach(function (value, index, array) {
+        console.log(this.name) // cc 打印，可以说明this指向obj
+        console.log(value, index, array) // 值 下标 数组
+        console.log(obj)
+    }, obj)
+    console.log(foreach) // undefined
+    // every
+    var o = { 0: 10, 1: 8, 2: 25, length: 3 };
+    var boo = Array.prototype.every.call(o, function (value, indx, o) {
+        return value >= 8
+    })
+    console.log(boo)
+    // some方法
+    var array = [18, 9, 10, 35, 80];
+    var isExist = array.some(function (value, index, array) {
+        return value > 20;
+    });
+    console.log(isExist); // true 
+    // map
+    var array1 = [18, 9, 10, 35, 80];
+    array1.map(item => item + 1);
+    console.log(array1); // [19, 10, 11, 36, 81]
+    // filter
+    var arr = [19, 10, 11, 36, 81]
+    var result = arr.filter(value=> value > 11)
+    console.log(result)
+    // reduce
+    var arr = [1,2,3,4,5]
+    var result = arr.reduce((pvalue, value) => pvalue*value)
+    console.log(result)
+    // reduceRight 和reduce的区别就是从后往前累计
+    var arr = [1,2,3,4,5]
+    var result = arr.reduceRight((pvalue, value) => pvalue*value)
+    console.log(result)
+    // entries 方法
+    var arr = [1,2,3]
+    var iterator = arr.entries()
+    console.log(iterator.next().value) // [0,1]
+    console.log(iterator.next().value) // [1,2]
+    console.log(iterator.next().value) // [2,3]
+    console.log(iterator.next().value) // undefined
+    console.log(iterator.next().value) // undefined
+    // values 方法，和entries一样
+    // find: 找到符合条件的就返回，找不到返回undefined    &      findIndex 找到就返回下标 ， 找不到返回-1
+    var arr = [1,2,5,3,7,8,5,12]
+    console.log(arr.find(value => value > 2)) // 5
+    console.log(arr.find(value => value > 13)) // undefined
+    console.log(arr.findIndex(value => value > 5)) // 4
+    console.log(arr.findIndex(value => value > 22)) // -1
+    // keys
+    var arr = [1,2,3,4,5,6]
+   console.log([...arr.keys()])
+
+
+
+
+</script>

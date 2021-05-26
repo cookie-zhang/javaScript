@@ -3,7 +3,7 @@
  * @Email: 
  * @Date: 2021-05-25 20:54:30
  * @LastEditors: zhangjianfei
- * @LastEditTime: 2021-05-26 09:29:13
+ * @LastEditTime: 2021-05-26 10:31:55
  * @Description: 
 -->
 <!DOCTYPE html>
@@ -162,10 +162,7 @@
 
     /**
      *  bind的实现其实和apply很相似，但是bind不是立即执行函数
-     *
-     *
     */
-
     Function.prototype.bind = function (context, ...args) {
         if (context && typeof context !== 'function') {
             return new Error('必须传入一个函数')
