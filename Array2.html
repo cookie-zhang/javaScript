@@ -1,0 +1,65 @@
+<!--
+ * @Author: zhangjianfei
+ * @Email: 
+ * @Date: 2021-05-27 09:27:01
+ * @LastEditors: zhangjianfei
+ * @LastEditTime: 2021-05-27 10:42:39
+ * @Description: 
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>js的类组</title>
+</head>
+
+<body>
+
+</body>
+
+</html>
+<script>
+    /**
+     * arguments
+     * 
+    */
+    function foo(name, age, sex) {
+        console.log(arguments) // Arguments ['jack', '18', 'male']
+        console.log(typeof arguments) // Onject
+        console.log(Object.prototype.toString.call(arguments)) // [Object Arguments] 
+    }
+    // 解析： 是object却不是 array  说明和数组还是有区别的
+    foo('jack', '18', 'male')
+    /**
+     * HTMLCollection
+     * 
+    */
+    /**
+     * NodeList
+     * 
+    */
+    var list = document.querySelectorAll('input[type=checkbox]');
+    for (var checkbox of list) {
+        checkbox.checked = true;
+    }
+    console.log(list);
+    console.log(typeof list); // object
+    console.log(Object.prototype.toString.call(list)); // [object NodeList]
+
+    /**
+     * 类数组转化为数组方法
+    */
+   // 方法一就是借用原型链上的push方法去操作
+   // 方法二就是借用ES6的方式去操作
+   function arrFrom(){
+       console.log(Array.from(arguments)) // [1,2,3,4]
+       console.log( Object.prototype.toString.call(Array.from(arguments))) // [object Array]
+       console.log([...arguments]) // [1,2,3,4]
+   }
+   arrFrom(1,2,3,4)
+
+   
+</script>

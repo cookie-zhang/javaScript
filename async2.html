@@ -1,0 +1,145 @@
+<!--
+ * @Author: zhangjianfei
+ * @Email: 
+ * @Date: 2021-05-27 16:11:56
+ * @LastEditors: zhangjianfei
+ * @LastEditTime: 2021-05-27 16:56:24
+ * @Description: 
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>理解Generator、Async/await等异步编程的语法糖</title>
+</head>
+
+<body>
+
+</body>
+
+</html>
+<script>
+    /**
+     * Generator: ES6出的生成器
+     * 描述：
+     *  1. generator是个带*的函数，不是一个真的函数
+     *  2. Generator的执行调用gen()后，不会执行语句，发生堵塞
+     *  3. 调用next() 可以控制程序一步一步往下执行，遇到yield停止，然后再next再执行
+     *  4. 返回值是一个对象，value是值，done是执行状态，true的时候代表执行完毕
+     *  5. yield支持函数嵌套
+    */
+    function* gen() {
+        let a = yield 1;
+        let b = yield 2;
+        let c = yield (function () {
+            return 3
+        })()
+        return 4
+    }
+    let g = gen()
+    console.log(g) // 阻塞住，什么也不会返回
+    console.log(g.next()) // {value: 1, done: false}
+    console.log(g.next()) // {value: 2, done: false}
+    console.log(g.next()) // {value: 3, done: false}
+    console.log(g.next()) // {value: 4, done: true}
+    console.log(g.next()) // {value: undefined, done: true}
+
+
+    /**
+     * async/await
+     *  描述：
+     *      1. ES7 引入的终极异步解决方案，不用引入其他的库，可读性好，代码简洁 
+     *      2. async/await是Generator的语法糖，是对Generator+co函数的再次改进和优化。是异步编程的饿终极解决方案
+     * 
+    */
+    async function pp() {
+        const result = await new Promise()
+    }
+
+
+    /**
+     * 手写一个发布订阅模式
+     * 
+     * 
+    */
+
+    EventEmitter.prototype.on = function(eventName, listener){
+	  if (!eventName || !listener) return;
+      // 判断回调的 listener 是否为函数
+	  if (!isValidListener(listener)) {
+	       throw new TypeError('listener must be a function');
+	  }
+	   var events = this.__events;
+	   var listeners = events[eventName] = events[eventName] || [];
+	   var listenerIsWrapped = typeof listener === 'object';
+       // 不重复添加事件，判断是否有一样的
+       if (indexOf(listeners, listener) === -1) {
+           listeners.push(listenerIsWrapped ? listener : {
+               listener: listener,
+               once: false
+           });
+       }
+	   return this;
+};
+// 判断是否是合法的 listener
+ function isValidListener(listener) {
+     if (typeof listener === 'function') {
+         return true;
+     } else if (listener && typeof listener === 'object') {
+         return isValidListener(listener.listener);
+     } else {
+         return false;
+     }
+}
+// 顾名思义，判断新增自定义事件是否存在
+function indexOf(array, item) {
+     var result = -1
+     item = typeof item === 'object' ? item.listener : item;
+     for (var i = 0, len = array.length; i < len; i++) {
+         if (array[i].listener === item) {
+             result = i;
+             break;
+         }
+     }
+     return result;
+}
+
+EventEmitter.prototype.emit = function(eventName, args) {
+     // 直接通过内部对象获取对应自定义事件的回调函数
+     var listeners = this.__events[eventName];
+     if (!listeners) return;
+     // 需要考虑多个 listener 的情况
+     for (var i = 0; i < listeners.length; i++) {
+         var listener = listeners[i];
+         if (listener) {
+             listener.listener.apply(this, args || []);
+             // 给 listener 中 once 为 true 的进行特殊处理
+             if (listener.once) {
+                 this.off(eventName, listener.listener)
+             }
+         }
+     }
+     return this;
+};
+
+EventEmitter.prototype.off = function(eventName, listener) {
+     var listeners = this.__events[eventName];
+     if (!listeners) return;
+     var index;
+     for (var i = 0, len = listeners.length; i < len; i++) {
+	    if (listeners[i] && listeners[i].listener === listener) {
+           index = i;
+           break;
+        }
+    }
+    // off 的关键
+    if (typeof index !== 'undefined') {
+         listeners.splice(index, 1, null)
+    }
+    return this;
+};
+
+</script>

@@ -1,0 +1,83 @@
+<!--
+ * @Author: zhangjianfei
+ * @Email: 
+ * @Date: 2021-05-27 10:51:58
+ * @LastEditors: zhangjianfei
+ * @LastEditTime: 2021-05-27 11:20:19
+ * @Description: 
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数组扁平化</title>
+</head>
+
+<body>
+
+</body>
+
+</html>
+<script>
+
+    /**
+     * 数组扁平化处理的6种方式
+     * 
+    */
+    // 方法1: 普通递归
+    let arr = [1, 2, 3, 4, [5, 6, 7, [8, 9], 10], 11]
+    function array(arr) {
+        let newArray = []
+        for (let i = 0; i < arr.length; i++) {
+            if (Array.isArray(arr[i])) {
+                newArray = newArray.concat(array(arr[i]))
+            } else {
+                newArray.push(arr[i])
+            }
+        }
+        return newArray
+    }
+    console.log(array(arr)) //  [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+
+    // 方法2: reduce
+    function arrayReduce(arr) {
+        // pv就是初始化就是传入的空数组
+        return arr.reduce((pv, v) => {
+            return pv.concat(Array.isArray(v) ? arrayReduce(v) : v)
+        }, [])
+    }
+    console.log(arrayReduce(arr)) // [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+    
+    // 方法3: 扩展运算符
+    function kuozhan(arr) {
+        while (arr.some(item => Array.isArray(item))) {
+            arr = [].concat(...arr)
+        }
+        return arr
+    }
+    console.log(kuozhan(arr)) // [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+
+    // 方法4: split 和 toString 共同处理
+    function splitToString(arr) {
+        return arr.toString().split(',') // arr.toString()  "1,2,3,4,5,6,7,8,9,10,11"
+    }
+    console.log(splitToString(arr)) // ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"]
+    // 方法5: ES6的flat  flat参数是1那就展开第一层，如果有多层的化就写 Infinity 最大值
+    function arrFlat(arr){
+        return arr.flat(Infinity)
+    }
+    console.log(arrFlat(arr)) // [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+
+    // 方法6: 正则 和 JSON 处理
+    function arrJSON(arr){
+        let str = JSON.stringify(arr) // "[1, 2, 3, 4, [5, 6, 7, [8, 9], 10], 11]"
+        str = str.replace(/(\[|\])/g,'') // 1,2,3,4,5,6,7,8,9,10,11
+        str = '['+str+']'
+        return JSON.parse(str)
+    }
+    console.log(arrJSON(arr)) //  [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+
+</script>

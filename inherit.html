@@ -3,7 +3,7 @@
  * @Email: 
  * @Date: 2021-05-25 12:04:58
  * @LastEditors: zhangjianfei
- * @LastEditTime: 2021-05-25 15:44:20
+ * @LastEditTime: 2021-05-27 14:10:16
  * @Description: 
 -->
 <!DOCTYPE html>
@@ -154,24 +154,52 @@
     //     // 改用Object.create 就可以减少组合继承中多进行一次构造的过程
     //     child.prototype = Object.create(parent.prototype)
     //     child.prototype.constructor = child;
-
     // }
+
+    function clone(parent, child) {
+        // 这里改用 Object.create 就可以减少组合继承中多进行一次构造的过程
+        child.prototype = Object.create(parent.prototype);
+        child.prototype.constructor = child;
+    }
+    function Parent6() {
+        this.name = 'parent6';
+        this.play = [1, 2, 3];
+    }
+    Parent6.prototype.getName = function () {
+        return this.name;
+    }
+    function Child6() {
+        Parent6.call(this);
+        this.friends = 'child5';
+    }
+
+    // 这里改用 Object.create 就可以减少组合继承中多进行一次构造的过程
+    Child6.prototype = Object.create(Parent6.prototype);
+    Child6.prototype.constructor = Child6;
+
+    Child6.prototype.getFriends = function () {
+        return this.friends;
+    }
+
+    let person6 = new Child6();
+    console.log(person6);
+    console.log(person6.getName());
+    console.log(person6.getFriends());
+
+    
+    // 自己写一个
     function parent6() {
         this.name = 'parent6';
         this.play = [1, 2, 3, 4, 5, 6]
     }
-
     parent6.prototype.getName = function () {
         return this.name
     }
-
     function child6() {
         parent6.call(this);
         this.friends = 'lucy'
     }
-
     // clone(parent6, child6)
-
     child6.prototype.getFriends = function () {
         return this.friends
     }
@@ -184,18 +212,18 @@
      * 
     */
 
-    class parent7{
-        constructor(name){
+    class parent7 {
+        constructor(name) {
             this.name = name
         }
 
-        getName = function(){
+        getName = function () {
             console.log('parent', this.name)
         }
     }
 
-    class child7 extends parent7{
-        constructor(name, age){
+    class child7 extends parent7 {
+        constructor(name, age) {
             super(name)
             this.age = age
         }

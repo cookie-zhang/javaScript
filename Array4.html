@@ -1,0 +1,81 @@
+<!--
+ * @Author: zhangjianfei
+ * @Email: 
+ * @Date: 2021-05-27 11:27:01
+ * @LastEditors: zhangjianfei
+ * @LastEditTime: 2021-05-27 11:50:40
+ * @Description: 
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数组排序</title>
+</head>
+
+<body>
+
+</body>
+
+</html>
+<script>
+    var arr = [1, 3, 6, 3, 23, 76, 1, 34, 222, 6, 456, 221];
+    var len = arr.length;
+    //方法1: 冒泡
+    function maopao(arr) {
+        if (len < 2) return arr;
+        for (let i = 0; i < len; i++) {
+            for (let j = 1; j < i; j++) {
+                if (arr[i] < arr[j]) {
+                    const temp = arr[j]
+                    arr[j] = arr[i]
+                    arr[i] = temp
+                }
+            }
+        }
+        return arr
+    }
+    console.log(maopao(arr))
+
+    // 快速排序
+    // 插入排序
+    // 选择排序
+    // 堆排序
+    // 归并排序
+    var a = [1, 3, 6, 3, 23, 76, 1, 34, 222, 6, 456, 221];
+    function mergeSort(array) {
+        const merge = (right, left) => {
+            const result = []
+            let il = 0
+            let ir = 0
+            while (il < left.length && ir < right.length) {
+                if (left[il] < right[ir]) {
+                    result.push(left[il++])
+                } else {
+                    result.push(right[ir++])
+                }
+            }
+            while (il < left.length) {
+                result.push(left[il++])
+            }
+            while (ir < right.length) {
+                result.push(right[ir++])
+            }
+            return result
+        }
+        
+        const mergeSort = array => {
+            if (array.length === 1) { return array }
+            const mid = Math.floor(array.length / 2)
+            const left = array.slice(0, mid)
+            const right = array.slice(mid, array.length)
+            return merge(mergeSort(left), mergeSort(right))
+        }
+        return mergeSort(array)
+    }
+    mergeSort(a);
+
+</script>
